@@ -1,26 +1,57 @@
-<h1>Form Page</h1>
-<!-- Form content goes here -->
-<div class="row">
-    <form class="col s12" id="resume-form">
-  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Page</title>
+  <!-- Add your CSS stylesheets or include Materialize CSS -->
+  <style>
+    /* Circular frame style */
+    .profile-pic-container {
+      width: 100px; /* Set the desired width and height for the circular frame */
+      height: 100px;
+      border-radius: 50%; /* Make it circular */
+      overflow: hidden; /* Hide overflow content */
+      margin: 0 auto; /* Center the circular frame */
+    }
+
+    .profile-pic-container img {
+      width: 100%; /* Make the image fill the circular frame */
+      height: 100%;
+      object-fit: cover; /* Maintain aspect ratio and cover the frame */
+    }
+
+    /* Center button text */
+    .center-text {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Form Page</h1>
+
+  <div class="row">
+    <form class="col s12" id="resume-form" action="/form" method="post">
+
       <div class="row">
         <div class="input-field col s6">
-          <input id="name" type="text" class="validate" required>
+          <input id="name" type="text" class="validate" autocomplete="name">
           <label for="name">Full Name</label>
         </div>
         <div class="input-field col s6">
-          <input id="title" type="text" class="validate" required>
+          <input id="title" type="text" class="validate" autocomplete="job-title">
           <label for="title">Job Title</label>
         </div>
       </div>
-  
+
       <div class="row">
         <div class="input-field col s12">
-          <input id="email" type="email" class="validate" required>
+          <input id="email" type="email" class="validate" autocomplete="email">
           <label for="email">Email Address</label>
         </div>
       </div>
-  
+
       <div class="row">
         <div class="input-field col s6">
           <input id="phone_number_1" type="tel" class="validate">
@@ -31,14 +62,14 @@
           <label for="phone_number_2">Phone Number 2 (Optional)</label>
         </div>
       </div>
-  
+
       <div class="row">
         <div class="input-field col s12">
           <input id="website" type="url" class="validate">
           <label for="website">Personal Website (Optional)</label>
         </div>
       </div>
-  
+
       <div class="row">
         <div class="input-field col s4">
           <input id="linkedin" type="url" class="validate">
@@ -53,41 +84,348 @@
           <label for="github">GitHub Profile</label>
         </div>
       </div>
-  
-      <div class="section">
-        <h5>Education</h5>
-        <div id="education-fields"></div>
-        <button class="btn waves-effect waves-light" type="button" id="add-education">Add Education</button>
+
+      <div class="row">
+        <div class="input-field col s12 center-text">
+          <div class="profile-pic-container">
+            <img id="profile_preview" src="#" alt="Profile Preview">
+          </div>
+          <div class="btn">
+            <span>Choose Profile</span>
+            <input type="file" id="profile_pic" accept="image/*" onchange="previewProfilePicture()">
+          </div>
+        </div>
       </div>
-  
+
+      <script>
+        // JavaScript function to preview the selected profile picture
+        function previewProfilePicture() {
+          const profilePicInput = document.getElementById('profile_pic');
+          const profilePreview = document.getElementById('profile_preview');
+    
+          const file = profilePicInput.files[0];
+          if (file) {
+            const reader = new FileReader();
+    
+            reader.onload = function (e) {
+              profilePreview.src = e.target.result;
+            };
+    
+            reader.readAsDataURL(file);
+          }
+        }
+      </script>
+
+      <div class="section" id="education-section">
+        <h5>Education</h5>
+        <div id="education-fields">
+          <!-- Education fields will be dynamically added here -->
+        </div>
+        <button class="btn waves-effect waves-light" type="button" onclick="addEducation()">Add Education</button>
+      
+        <script>
+          function addEducation() {
+            const educationFields = document.getElementById('education-fields');
+            
+            const educationField = document.createElement('div');
+            educationField.className = 'row';
+      
+            // Add input fields for each property
+            educationField.innerHTML = `
+              <div class="input-field col s4">
+                <input id="institute" type="text" class="validate">
+                <label for="institute">Institute</label>
+              </div>
+              <div class="input-field col s3">
+                <input id="degree" type="text" class="validate">
+                <label for="degree">Degree</label>
+              </div>
+              <div class="input-field col s2">
+                <input id="start_date" type="text" class="datepicker start-date">
+                <label for="start_date">Start Date</label>
+              </div>
+              <div class="input-field col s2">
+                <input id="end_date" type="text" class="datepicker end-date">
+                <label for="end_date">End Date</label>
+              </div>
+              <div class="input-field col s1">
+                <input id="grades" type="text" class="validate">
+                <label for="grades">Grades</label>
+              </div>
+            `;
+      
+            educationFields.appendChild(educationField);
+      
+            // Initialize the datepickers
+            const startDatepickers = document.querySelectorAll('.start-date');
+            const endDatepickers = document.querySelectorAll('.end-date');
+      
+            M.Datepicker.init(startDatepickers, {
+              format: 'dd mmm, yyyy',
+              autoClose: true,
+              onSelect: updateDateDisplay,
+            });
+      
+            M.Datepicker.init(endDatepickers, {
+              format: 'dd mmm, yyyy',
+              autoClose: true,
+              onSelect: updateDateDisplay,
+            });
+      
+            function updateDateDisplay() {
+              const startDates = document.querySelectorAll('.start-date');
+              const endDates = document.querySelectorAll('.end-date');
+      
+              startDates.forEach((startDate, index) => {
+                const endDate = endDates[index];
+                const displayField = startDate.closest('.row').querySelector('.date-display');
+      
+                const startDateValue = startDate.value || 'Start Date';
+                const endDateValue = endDate.value || 'End Date';
+      
+                displayField.innerHTML = `${startDateValue} - ${endDateValue}`;
+              });
+            }
+          }
+        </script>
+      </div>
+      
+
       <div class="section">
         <h5>Projects</h5>
-        <div id="project-fields"></div>
+        <div id="project-fields">
+          <!-- Project fields will be dynamically added here -->
+        </div>
         <button class="btn waves-effect waves-light" type="button" id="add-project">Add Project</button>
       </div>
-  
+      
+      <script>
+        document.getElementById('add-project').addEventListener('click', addProject);
+      
+        function addProject() {
+          const projectFields = document.getElementById('project-fields');
+      
+          const projectField = document.createElement('div');
+          projectField.className = 'row';
+      
+          // Add input fields for each project property
+          projectField.innerHTML = `
+            <div class="input-field col s4">
+              <input id="project_name" type="text" class="validate">
+              <label for="project_name">Project Name</label>
+            </div>
+            <div class="input-field col s4">
+              <input id="project_link" type="text" class="validate">
+              <label for="project_link">Project Link</label>
+            </div>
+            <div class="input-field col s4">
+              <textarea id="technologies" class="materialize-textarea validate"></textarea>
+              <label for="technologies">Technologies (Enter each tech on a new line)</label>
+            </div>
+            <div class="input-field col s8">
+              <textarea id="project_description" class="materialize-textarea validate"></textarea>
+              <label for="project_description">Project Description</label>
+            </div>
+            <div class="input-field col s2">
+              <input id="project_date" type="text" class="datepicker">
+              <label for="project_date">Project Date (DD MMM, YYYY)</label>
+            </div>
+          `;
+      
+          projectFields.appendChild(projectField);
+      
+          // Initialize the datepicker with the desired format
+          const datepickers = document.querySelectorAll('.datepicker');
+          M.Datepicker.init(datepickers, {
+            format: 'dd mmm, yyyy', // Adjust the date format as needed
+            autoClose: true,
+          });
+      
+          // Enable the label click to focus on the associated input
+          const inputFields = projectField.querySelectorAll('.validate');
+          inputFields.forEach(input => {
+            const label = projectField.querySelector(`label[for="${input.id}"]`);
+            label.addEventListener('click', () => {
+              input.focus();
+            });
+          });
+        }
+      </script>
+      
+
       <div class="section">
         <h5>Awards & Certificates</h5>
-        <div id="awards-fields"></div>
+        <div id="awards-fields">
+          <!-- Awards fields will be dynamically added here -->
+        </div>
         <button class="btn waves-effect waves-light" type="button" id="add-award">Add Award</button>
       </div>
-  
+      
+      <script>
+        document.getElementById('add-award').addEventListener('click', addAward);
+      
+        function addAward() {
+          const awardsFields = document.getElementById('awards-fields');
+      
+          const awardField = document.createElement('div');
+          awardField.className = 'row';
+      
+          // Add input fields for each award property
+          awardField.innerHTML = `
+            <div class="input-field col s4">
+              <input id="award_name" type="text" class="validate">
+              <label for="award_name">Award Name</label>
+            </div>
+            <div class="input-field col s4">
+              <input id="certificate_link" type="text" class="validate">
+              <label for="certificate_link">Certificate Link</label>
+            </div>
+            <div class="input-field col s2">
+              <input id="award_issuer" type="text" class="validate">
+              <label for="award_issuer">Award Issuer</label>
+            </div>
+            <div class="input-field col s2">
+              <input id="award_date" type="text" class="datepicker">
+              <label for="award_date">Award Date (DD MMM, YYYY)</label>
+            </div>
+          `;
+      
+          awardsFields.appendChild(awardField);
+      
+          // Initialize the datepicker with the desired format
+          const datepickers = document.querySelectorAll('.datepicker');
+          M.Datepicker.init(datepickers, {
+            format: 'dd mmm, yyyy', // Adjust the date format as needed
+            autoClose: true,
+          });
+      
+          // Enable the label click to focus on the associated input
+          const inputFields = awardField.querySelectorAll('.validate');
+          inputFields.forEach(input => {
+            const label = awardField.querySelector(`label[for="${input.id}"]`);
+            label.addEventListener('click', () => {
+              input.focus();
+            });
+          });
+        }
+      </script>
+      
+
       <div class="row">
         <div class="input-field col s12">
-          <textarea id="summary" class="materialize-textarea validate" required></textarea>
+          <textarea id="summary" class="materialize-textarea validate"></textarea>
           <label for="summary">Summary</label>
         </div>
       </div>
-  
+
       <div class="row">
         <div class="input-field col s12">
           <input id="resume_link" type="url" class="validate">
           <label for="resume_link">Link to Resume File (Optional)</label>
         </div>
       </div>
-  
+
       <button class="btn waves-effect waves-light" type="submit">Submit</button>
-  
+
     </form>
   </div>
-  
+
+  <!-- Add your JavaScript scripts or include Materialize JS -->
+  <!-- <script>
+    function previewProfilePicture() {
+      const profilePicInput = document.getElementById('profile_pic');
+      const profilePreview = document.getElementById('profile_preview');
+
+      const file = profilePicInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          profilePreview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function submitForm() {
+      const formData = {
+        name: document.getElementById('name').value,
+        title: document.getElementById('title').value,
+        email: document.getElementById('email').value,
+        phone_number_1: document.getElementById('phone_number_1').value,
+        phone_number_2: document.getElementById('phone_number_2').value,
+        website: document.getElementById('website').value,
+        linkedin: document.getElementById('linkedin').value,
+        twitter: document.getElementById('twitter').value,
+        github: document.getElementById('github').value,
+        // Add other fields as needed
+        education: gatherEducationData(),
+        projects: gatherProjectData(),
+        awards: gatherAwardData(),
+        summary: document.getElementById('summary').value,
+        resume_link: document.getElementById('resume_link').value,
+      };
+
+      console.log(JSON.stringify(formData, null, 2));
+    }
+
+    function gatherEducationData() {
+      const educationFields = document.querySelectorAll('#education-fields .row');
+      const educationData = [];
+
+      educationFields.forEach(field => {
+        const data = {
+          institute: field.querySelector('#institute').value,
+          degree: field.querySelector('#degree').value,
+          start_date: field.querySelector('#start_date').value,
+          end_date: field.querySelector('#end_date').value,
+          grades: field.querySelector('#grades').value,
+        };
+
+        educationData.push(data);
+      });
+
+      return educationData;
+    }
+
+    function gatherProjectData() {
+      const projectFields = document.querySelectorAll('#project-fields .row');
+      const projectData = [];
+
+      projectFields.forEach(field => {
+        const data = {
+          project_name: field.querySelector('#project_name').value,
+          project_link: field.querySelector('#project_link').value,
+          technologies: field.querySelector('#technologies').value,
+          project_description: field.querySelector('#project_description').value,
+          project_date: field.querySelector('#project_date').value,
+        };
+
+        projectData.push(data);
+      });
+
+      return projectData;
+    }
+
+    function gatherAwardData() {
+      const awardFields = document.querySelectorAll('#awards-fields .row');
+      const awardData = [];
+
+      awardFields.forEach(field => {
+        const data = {
+          award_name: field.querySelector('#award_name').value,
+          certificate_link: field.querySelector('#certificate_link').value,
+          award_issuer: field.querySelector('#award_issuer').value,
+          award_date: field.querySelector('#award_date').value,
+        };
+
+        awardData.push(data);
+      });
+
+      return awardData;
+    }
+  </script> -->
+
+</body>
+</html>
